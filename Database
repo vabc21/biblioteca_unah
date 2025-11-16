@@ -1,0 +1,87 @@
+CREATE TABLE usuario (
+    usuario_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    telefono VARCHAR(15),
+    tipo VARCHAR(20) NOT NULL,
+    estado VARCHAR(20) DEFAULT 'activo',
+    fecha_registro DATETIME DEFAULT GETDATE()
+);
+
+CREATE TABLE libros (
+    libro_id INT IDENTITY(1,1) PRIMARY KEY,
+    titulo VARCHAR(200) NOT NULL,
+    editorial VARCHAR(100),
+    año_publicacion INT,
+    estado VARCHAR(20) DEFAULT 'disponible'
+);
+
+CREATE TABLE autores (
+    autor_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    nacionalidad VARCHAR(50),
+    fecha_nacimiento DATE
+);
+
+CREATE TABLE categorias (
+    categoria_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT
+);
+
+CREATE TABLE prestamos (
+    prestamo_id INT IDENTITY(1,1) PRIMARY KEY,
+    id_usuario INT NOT NULL FOREIGN KEY REFERENCES usuario(usuario_id),
+    fecha_prestamo DATETIME DEFAULT GETDATE(),
+    fecha_devolucion DATETIME NOT NULL,
+    estado VARCHAR(20) DEFAULT 'activo'
+);
+
+CREATE TABLE detalle_prestamo (
+    detalle_id INT IDENTITY(1,1) PRIMARY KEY,
+    id_prestamo INT NOT NULL FOREIGN KEY REFERENCES prestamos(prestamo_id),
+    id_libro INT NOT NULL FOREIGN KEY REFERENCES libros(libro_id),
+    estado_ejemplar VARCHAR(20) DEFAULT 'bueno'
+);
+
+CREATE TABLE libro_autor (
+    id_libro INT NOT NULL FOREIGN KEY REFERENCES libros(libro_id),
+    id_autor INT NOT NULL FOREIGN KEY REFERENCES autores(autor_id),
+    PRIMARY KEY (id_libro, id_autor)
+);
+
+CREATE TABLE libro_categoria (
+    id_libro INT NOT NULL FOREIGN KEY REFERENCES libros(libro_id),
+    id_categoria INT NOT NULL FOREIGN KEY REFERENCES categorias(categoria_id),
+    PRIMARY KEY (id_libro, id_categoria)
+);
+INSERT INTO usuario (nombre, email, telefono, tipo) VALUES
+('Pierla Garcia', 'marlaghnah.edu.hn', '3766-4321', 'bibliotecario'),
+('Carlos López', 'carlos@hrah.edu.hn', '5555-1234', 'estudiante');
+
+INSERT INTO autores (nombre, nacionalidad, fecha_nacimiento) VALUES
+('Gabriel García Márquez', 'Colombiano', '1927-03-06'),
+('J.K. Rowling', 'Británica', '1965-07-31'),
+('Mario Vargas Llosa', 'Peruano', '1938-03-28');
+
+INSERT INTO categorias (nombre, descripcion) VALUES
+('Ficción', 'Novelas de ficción y literatura imaginativa'),
+('Fantasía', 'Literatura fantástica y de magia'),
+('Realismo Mágico', 'Género literario latinoamericano');
+
+INSERT INTO libros (titulo, editorial, año_publicacion) VALUES
+('Cien años de soledad', 'Sudamericana', 1967),
+('Harry Potter y la piedra filosofal', 'Salamandra', 1997),
+('La ciudad y los perros', 'Seix Barral', 1963);
+
+INSERT INTO libro_autor (id_libro, id_autor) VALUES
+(1, 1), -- Cien años - García Márquez
+(2, 2), -- Harry Potter - Rowling
+(3, 3); -- Ciudad y perros - Vargas Llosa
+
+INSERT INTO libro_categoria (id_libro, id_categoria) VALUES
+(1, 1), (1, 3), -- Cien años: Ficción + Realismo Mágico
+(2, 1), (2, 2), -- Harry Potter: Ficción + Fantasía
+(3, 1); -- Ciudad y perros: Ficción
+
+Add database tables and test data
