@@ -8,6 +8,10 @@ from config import settings
 from database import create_all_tables
 from app.routers import router
 
+# ================================================================
+#                     LIFESPAN EVENTS
+# ================================================================
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
@@ -32,6 +36,10 @@ async def lifespan(app: FastAPI):
     print("🔴 Cerrando aplicación...")
     print("=" * 50)
 
+# ================================================================
+#                   CREAR APLICACIÓN FASTAPI
+# ================================================================
+
 app = FastAPI(
     title=settings.API_TITLE,
     description=settings.API_DESCRIPTION,
@@ -39,24 +47,27 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# ================================================================
+#                      MIDDLEWARES
+# ================================================================
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=settings.get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# ================================================================
+#                   INCLUIR ROUTERS
+# ================================================================
+
 app.include_router(router, prefix="/api/v1")
 
-@app.get("/health", tags=["Health"])
-def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "ok",
-        "service": settings.API_TITLE,
-        "version": settings.API_VERSION
-    }
+# ================================================================
+#                     ENDPOINTS BASE
+# ================================================================
 
 @app.get("/health", tags=["Health"])
 def health_check():
@@ -76,6 +87,10 @@ def root():
         "documentation": "/docs",
         "redoc": "/redoc"
     }
+
+# ================================================================
+#                   PUNTO DE ENTRADA
+# ================================================================
 
 if __name__ == "__main__":
     import uvicorn

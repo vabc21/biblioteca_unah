@@ -1,30 +1,24 @@
-# config.py
-
-from pydantic_settings import BaseSettings
+import os
 from typing import List
 
-class Settings(BaseSettings):
-    """Configuración principal de la aplicación"""
+class Settings:
+    """Configuración principal de la aplicación - SIN Pydantic Settings"""
     
     # ====== BASE DE DATOS ======
-    DB_SERVER: str
-    DB_PORT: int = 1433
-    DB_NAME: str
-    DB_USER: str
-    DB_PASSWORD: str
-    DB_DRIVER: str = "{ODBC Driver 18 for SQL Server}"
+    DB_SERVER: str = os.getenv("DB_SERVER", "localhost")
+    DB_PORT: int = int(os.getenv("DB_PORT", 1433))
+    DB_NAME: str = os.getenv("DB_NAME", "biblioteca_dev")
+    DB_USER: str = os.getenv("DB_USER", "sa")
+    DB_PASSWORD: str = os.getenv("DB_PASSWORD", "YourPassword123!")
+    DB_DRIVER: str = os.getenv("DB_DRIVER", "{ODBC Driver 18 for SQL Server}")
     
     # ====== APLICACIÓN ======
-    API_TITLE: str = "Biblioteca API"
-    API_VERSION: str = "1.0.0"
-    API_DESCRIPTION: str = "API para gestionar una biblioteca con FastAPI y SQL Azure"
+    API_TITLE: str = os.getenv("API_TITLE", "Biblioteca API")
+    API_VERSION: str = os.getenv("API_VERSION", "1.0.0")
+    API_DESCRIPTION: str = os.getenv("API_DESCRIPTION", "API para gestionar una biblioteca con FastAPI y SQL Azure")
     
     # ====== CORS ======
-    CORS_ORIGINS: List[str] = ["*"]
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    CORS_ORIGINS: str = os.getenv("CORS_ORIGINS", "*")
     
     @property
     def database_url(self) -> str:
@@ -41,12 +35,18 @@ class Settings(BaseSettings):
             f"Uid={self.DB_USER};"
             f"Pwd={self.DB_PASSWORD};"
             f"Encrypt=yes;"
-            f"TrustServerCertificate=no;"
+            f"TrustServerCertificate=yes;"
             f"Connection Timeout=30;"
         )
         
         params = urllib.parse.quote_plus(connection_string)
         return f"mssql+pyodbc:///?odbc_connect={params}"
+    
+    def get_cors_origins(self) -> List[str]:
+        """Convertir CORS_ORIGINS a lista"""
+        if self.CORS_ORIGINS == "*":
+            return ["*"]
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
 
 # Instancia global de configuración
 settings = Settings()
