@@ -1,0 +1,21 @@
+# FastAPI
+fastapi[standard]
+uvicorn[standard]
+pydantic
+pydantic-settings
+
+# Database - Azure SQL Server
+sqlalchemy
+pyodbc
+python-dotenv
+
+# Validation & serialization
+email-validator
+
+# Development
+pytest
+pytest-asyncio
+httpx
+
+# Utilities
+typing-extensions
